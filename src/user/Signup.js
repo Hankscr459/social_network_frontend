@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { signup } from '../auth'
 
 const Signup = () => {
@@ -35,7 +36,7 @@ const Signup = () => {
         })
     }
 
-    const signForm = () => (
+    const signupForm = () => (
         <form>
             <div className='form-group'>
                 <label className='text-muted'>Name</label>
@@ -87,8 +88,9 @@ const Signup = () => {
                 style={{ display: open ? '' : 'none' }}
             >
                 New account is successfully created. Please Sign In.
+                <Link to='/signin'>Sign In</Link>
             </div>
-            {signForm()}
+            {signupForm()}
         </div>
     )
 }

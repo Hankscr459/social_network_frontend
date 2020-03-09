@@ -1,9 +1,6 @@
-import React, {useEffect} from 'react'
+import React from 'react'
 
 const Home = () => {
-    useEffect(() => {
-        console.log(`${process.env.REACT_APP_TEST}`)
-    })
     return (
         <div className='jumbotron'>
             <h2>Home</h2>
