@@ -4,14 +4,40 @@ import { isAuthenticated } from '../auth'
 import { read } from './apiUser'
 import DefaultProfile from '../images/avatar.jpg'
 import DeleteUser from './DeleteUser'
+import FellowProfileButton from './FellowProfileButton'
 
 const Profile = ({match}) => {
     const [values, setValues] = useState({
-        user: '',
-        redirectToSignin: false
+        user: {following: [], followers: []},
+        redirectToSignin: false,
+        following: false,
+        error: ''
     })
-    const { user, redirectToSignin } = values
 
+    const checkFllow = (user) => {
+        const jwt = isAuthenticated()
+        const matches = user.followers.find((follower) => {
+            // one id has many other ids (followers) and vice versa
+            return follower._id === jwt.user._id
+        })
+        return matches
+    }
+
+    const clickFollowButton = callApi => {
+        const userId = isAuthenticated().user._id
+        const token = isAuthenticated().token
+        callApi(userId, token, user._id)
+        .then(data => {
+            if(data.error) {
+                setValues({...values, error: data.error})
+            } else {
+                setValues({...values, user: data, following: !following})
+            }
+        })
+    }
+
+    const { user, redirectToSignin, following, error } = values
+    
     const userId = match.params.userId
     const init = (userId) => {
         const token = isAuthenticated().token
@@ -20,7 +46,8 @@ const Profile = ({match}) => {
             if(data.error) {
                 setValues(prev => ({ ...prev, redirectToSignin: true }))
             } else {
-                setValues(prev => ({ ...prev, user: data}))
+                let following = checkFllow(data)
+                setValues(prev => ({ ...prev, user: data, following }))
             }
         })
     }
@@ -63,7 +90,7 @@ const Profile = ({match}) => {
                         ).toDateString()}`}</p>
                     </div>
                     {isAuthenticated().user &&
-                        isAuthenticated().user._id === user._id && (
+                        isAuthenticated().user._id === user._id ? (
                             <div className='d-inline-block'>
                                 <Link
                                     className='btn btn-raised btn-success mr-5'
@@ -73,6 +100,11 @@ const Profile = ({match}) => {
                                 </Link>
                                 <DeleteUser userId={user._id} />
                             </div>
+                        ): (
+                            <FellowProfileButton
+                                following={following} 
+                                onButtonClick={clickFollowButton}
+                            />
                         )}
                 </div>
             </div>
