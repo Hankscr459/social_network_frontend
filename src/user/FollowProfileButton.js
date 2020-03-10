@@ -1,10 +1,13 @@
 import React from 'react'
-import { follow } from './apiUser'
+import { follow, unfollow } from './apiUser'
 
 const FellowProfileButton = ({following, onButtonClick}) => {
 
     const followClick = () =>{
         onButtonClick(follow)
+    }
+    const unfollowClick = () =>{
+        onButtonClick(unfollow)
     }
 
     return (
@@ -16,7 +19,7 @@ const FellowProfileButton = ({following, onButtonClick}) => {
                     Follow
                 </button>
             )  :  (
-                <button className='btn btn-warning btn-raised'>
+                <button onClick={unfollowClick} className='btn btn-warning btn-raised'>
                     UnFollow
                 </button>
             )
