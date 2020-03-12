@@ -6,6 +6,7 @@ import DefaultProfile from '../images/avatar.jpg'
 import DeleteUser from './DeleteUser'
 import FollowProfileButton from './FollowProfileButton'
 import ProfileTabs from './ProfileTabs'
+import { listByUser } from '../post/apiPost'
 
 const Profile = ({match}) => {
     const [values, setValues] = useState({
@@ -13,6 +14,9 @@ const Profile = ({match}) => {
         redirectToSignin: false,
         following: false,
         error: ''
+    })
+    const [postsValues, setpostsValues] = useState({
+        posts: []
     })
 
     const checkFllow = (user) => {
@@ -36,7 +40,7 @@ const Profile = ({match}) => {
             }
         })
     }
-
+    const { posts } = postsValues
     const { user, redirectToSignin, following } = values
     
     const userId = match.params.userId
@@ -49,10 +53,23 @@ const Profile = ({match}) => {
             } else {
                 let following = checkFllow(data)
                 setValues(prev => ({ ...prev, user: data, following }))
+                loadPosts(data)
             }
         })
     }
    
+    const loadPosts = () => {
+        const token = isAuthenticated().token
+        const userUId = match.params.userId
+        listByUser(userUId, token).then(data => {
+            if(data.error) {
+                console.log(data.error)
+            } else {
+                setpostsValues({ posts: data })
+            }
+        })
+    }
+
     useEffect(() => {
         init(userId)
     },[userId] )
@@ -73,7 +90,7 @@ const Profile = ({match}) => {
         <div className='container'>
             <h2 className='mt-5 mb-5'>Profile</h2>
             <div className='row'>
-                <div className='col-md-6'>
+                <div className='col-md-4'>
                 <img
                     style={{ height: '200px', width: 'auto' }}
                     className='img-thumbnail'
@@ -82,8 +99,8 @@ const Profile = ({match}) => {
                 />
                     {redirect()}
                 </div>
-                <div className='col-md-6'>
-                    <div className='lead'>
+                <div className='col-md-8'>
+                    <div className='lead mt-2'>
                         <p>Hello {user.name}</p>
                         <p>Email: {user.email}</p>
                         <p>{`Joined ${new Date(
@@ -93,6 +110,12 @@ const Profile = ({match}) => {
                         {isAuthenticated().user &&
                             isAuthenticated().user._id === user._id ? (
                                 <div className='d-inline-block'>
+                                    <Link
+                                        className='btn btn-raised btn-info mr-5'
+                                        to={`/posts/create`}
+                                    >
+                                        Create Post
+                                    </Link>
                                     <Link
                                         className='btn btn-raised btn-success mr-5'
                                         to={`/user/edit/${user._id}`}
@@ -118,7 +141,7 @@ const Profile = ({match}) => {
                 <ProfileTabs 
                     followers={user.followers} 
                     following={user.following}
-                    id={user._id}
+                    posts={posts}
                 />
                 </div>
             </div>
