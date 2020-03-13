@@ -3,6 +3,7 @@ import { Link, Redirect } from 'react-router-dom'
 import { singlePost, remove, Addlike, Addunlike } from './apiPost'
 import DefaultPost from '../images/Forest-Cat.jpg'
 import { isAuthenticated } from '../auth'
+import Comment from './Comment'
 
 const SinglePost = ({match}) => {
     const [values, setValues] = useState({
@@ -11,10 +12,11 @@ const SinglePost = ({match}) => {
         redirectToHome: false,
         redirectToSignin: false,
         like: false,
-        likes: 0
+        likes: 0,
+        comments: []
     })
 
-    const { post, redirectToHome, redirectToSignin,like, likes } = values
+    const { post, redirectToHome, redirectToSignin,like, likes, comments } = values
     const postId = match.params.postId
 
     const checkLike = (likes) => {
@@ -33,11 +35,16 @@ const SinglePost = ({match}) => {
                     ...prev, 
                     post: data, 
                     likes: data.likes.length, 
-                    like: checkLike(data.likes) 
+                    like: checkLike(data.likes),
+                    comments: data.comments
                 }))
             }
         })
     }, [postId])
+
+    const updateComments = comments => {
+        setValues(prev => ({  ...prev, comments }))
+    }
 
     const likeToogle = () => {
         if(!isAuthenticated()) {
@@ -173,6 +180,7 @@ const SinglePost = ({match}) => {
             )}
             {redirect()}
             {ToSignin()}
+            <Comment postId={post._id} comments={comments} updateComments={updateComments} />
         </div>
     )
 }
