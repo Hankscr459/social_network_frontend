@@ -180,7 +180,7 @@ const SinglePost = ({match}) => {
             )}
             {redirect()}
             {ToSignin()}
-            <Comment postId={post._id} comments={comments} updateComments={updateComments} />
+            <Comment postId={post._id} comments={comments.reverse()} updateComments={updateComments} />
         </div>
     )
 }

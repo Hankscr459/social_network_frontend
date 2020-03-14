@@ -6,32 +6,80 @@ import DefaultProfile from '../images/avatar.jpg'
 
 const Comment = ({ comments, postId, updateComments }) => {
     const [values, setValues] = useState({
-        text: ''
+        text: '',
+        error: ''
     })
 
-    const { text } = values
+    const { text, error } = values
+
+    const isValid = () => {
+        if(!text.length > 0 || text.length > 150 ) {
+            setValues({ 
+                ...values,
+                error: 'Comment should not be empty and less than 150 characters long' 
+            })
+            return false
+        }
+        return true
+    }
 
     const handleChange= (event) => {
-        setValues({ ...values, text: event.target.value })
+        setValues({ ...values, text: event.target.value, error: false })
     }
 
     const Addcomments = e =>{
         e.preventDefault();
-        const userId = isAuthenticated().user._id
-        const token = isAuthenticated().token
-        const postUId = postId
-        const comment = { text: text }
-        Addcomment(userId, token, postUId, comment)
-        .then(data => {
-            if(data.error) {
-                console.log(data.error)
+        if(!isAuthenticated()) {
+            setValues({error: 'Please Signin to leave a comment'})
+            return false
+        }
+        if(isValid()) {
+            const userId = isAuthenticated().user._id
+            const token = isAuthenticated().token
+            const postUId = postId
+            const comment = { text: text }
+            Addcomment(userId, token, postUId, comment)
+            .then(data => {
+                if(data.error) {
+                    console.log(data.error)
+                } else {
+                    setValues({...values, text: ''})
+                    // dispatch fresh
+                    updateComments(data.comments)
+                }
+            })
+        }
+    }
+    const deleteComment = comment => {
+        const userId = isAuthenticated().user._id;
+        const token = isAuthenticated().token;
+        const postUId = postId;
+
+        Adduncomment(userId, token, postUId, comment).then(data => {
+            if (data.error) {
+                console.log(data.error);
             } else {
-                setValues({...values, text: ''})
-                // dispatch fresh
-                updateComments(data.comments)
+                updateComments(data.comments);
             }
         })
     }
+    const deleteConfirmed = comment => {
+        let answer = window.confirm(
+            "Are you sure you want to delete your comment?"
+        );
+        if (answer) {
+            deleteComment(comment);
+        }
+    }
+
+    const showError = () => (
+        <div
+            className='alert alert-danger mt-4 mb-2'
+            style={{display: error ? '' : 'none'}}
+        >
+            {error}
+        </div>
+    )
 
     return (
         <div>
@@ -41,11 +89,15 @@ const Comment = ({ comments, postId, updateComments }) => {
                     type='text' 
                     onChange={handleChange} 
                     className='form-control' 
+                    value={text}
+                    placeholder='Leave a comment...'
                 />
+                <button className='btn btn-raised btn-success mt-2'>
+                    Post
+                </button>
             </form>
-            {JSON.stringify(comments)}
-            <hr />
-            <div className='col-md-8 col-md-off'>
+            {showError()}
+            <div className='col-md-12'>
                 <h3 className='text-primary'>{comments.length} Comments</h3>
                 <hr />
                 {comments.map((comment, i) => 
@@ -65,10 +117,31 @@ const Comment = ({ comments, postId, updateComments }) => {
                                             alt={comment.postedBy.name}
                                             onError={i => (i.target.src = `${DefaultProfile}`)}
                                         />
+                                    </Link>
                                         <div>
                                             <p className='lead'>{comment.text}</p>
+                                            <p className='font-italic mark'>
+                                                Posted By 
+                                                <Link to={`/user/${comment.postedBy._id}`}>
+                                                    {' '}{comment.postedBy.name}{' '}
+                                                </Link>
+                                                on {new Date(comment.created).toDateString()}
+                                                <span>
+                                                    {isAuthenticated().user &&
+                                                        isAuthenticated().user._id === comment.postedBy._id && (
+                                                        <>
+                                                            <span 
+                                                                onClick={() => deleteConfirmed(comment)} 
+                                                                className='text-danger float-right mr-1'
+                                                            >
+                                                                Remove
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                </span>
+                                            </p>
                                         </div>
-                                    </Link>
+                                    
                                 </div>
                         </div>
                     )
