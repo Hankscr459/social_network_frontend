@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Redirect } from 'react-router-dom'
+import { Redirect, Link } from 'react-router-dom'
 import { signin, authenticate } from '../auth'
 
 const Signin = () => {
@@ -43,32 +43,40 @@ const Signin = () => {
     }
 
     const signinForm = () => (
-        <form>
-            <div className='form-group'>
-                <label className='text-muted'>Email</label>
-                <input
-                    onChange={handleChange('email')}
-                    type='email'
-                    className='form-control'
-                    value={email}
-                />
-            </div>
-            <div className='form-group'>
-                <label className='text-muted'>Password</label>
-                <input
-                    onChange={handleChange('password')}
-                    type='password'
-                    className='form-control'
-                    value={password}
-                />
-            </div>
-            <button
-                onClick={clickSubmit}
-                className='btn btn-raised btn btn-primary'
-            >
-                Submit
-            </button>
-        </form>
+        <>
+            <form>
+                <div className='form-group'>
+                    <label className='text-muted'>Email</label>
+                    <input
+                        onChange={handleChange('email')}
+                        type='email'
+                        className='form-control'
+                        value={email}
+                    />
+                </div>
+                <div className='form-group'>
+                    <label className='text-muted'>Password</label>
+                    <input
+                        onChange={handleChange('password')}
+                        type='password'
+                        className='form-control'
+                        value={password}
+                    />
+                </div>
+                <button
+                    onClick={clickSubmit}
+                    className='btn btn-raised btn btn-primary'
+                >
+                    Submit
+                </button>
+            </form>
+            <p>
+                <Link to="/forgot-password" className="text-danger">
+                    {" "}
+                    Forgot Password
+                </Link>
+            </p>
+        </>
     )
     
     const showLoading = () => (
