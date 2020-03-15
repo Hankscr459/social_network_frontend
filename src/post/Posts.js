@@ -5,20 +5,35 @@ import DefaultPost from '../images/Forest-Cat.jpg'
 
 const Posts = () => {
     const [values, setValues] = useState({
-        posts: []
+        posts: [],
+        page: 1
     })
-    const { posts } = values
+    const { posts, page } = values
     useEffect(() => {
-        list().then(data => {
-            if(data.error) {
-                console.log(data.error)
+        loadPosts(page)
+    }, [page])
+
+    const loadPosts = page => {
+        list(page).then(data => {
+            if (data.error) {
+                console.log(data.error);
             } else {
                 setValues(prev => ({ ...prev, posts: data}))
             }
-        })
-    }, [])
+        });
+    };
 
-    
+    const loadMore = number => {
+        setValues(prev => ({ ...prev,page: page + number }))
+        loadPosts(page + number)
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    };
+ 
+    const loadLess = number => {
+        setValues(prev => ({ ...prev,page: page - number }))
+        loadPosts(page - number)
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
 
     const renderPosts = posts => {
         return (
@@ -70,9 +85,28 @@ const Posts = () => {
             <h2 className='mt-5 mb-5'>
                 {!posts.length ? 'Loading...' : 'Recent Posts'}
             </h2>
-            <div>
                 {renderPosts(posts)}
-            </div>
+                {page > 1 ? (
+                    <button
+                        className="btn btn-raised btn-warning mr-5 mt-5 mb-5"
+                        onClick={() => loadLess(1)}
+                    >
+                        Previous ({page - 1})
+                    </button>
+                ) : (
+                    ""
+                )}
+
+                {posts.length ? (
+                    <button
+                        className="btn btn-raised btn-success mt-5 mb-5"
+                        onClick={() => loadMore(1)}
+                    >
+                        Next ({page + 1})
+                    </button>
+                ) : (
+                    ""
+                )}
         </div>
     )
 }
