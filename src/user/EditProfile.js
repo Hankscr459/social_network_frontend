@@ -216,8 +216,7 @@ const EditProfile = ({match}) => {
                 src={photoUrl} 
                 alt={userId.name} 
             />
-            {isAuthenticated().user.role === "admin" ||
-                (isAuthenticated().user._id === id && updatedForm())}
+            {updatedForm()}
             {redirect()}
         </div>
     )
