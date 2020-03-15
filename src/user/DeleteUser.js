@@ -21,6 +21,8 @@ const DeleteUser = ({ userId }) => {
         .then(data => {
             if(data.error) {
                 console.log(data.error)
+            } else if(isAuthenticated().user.role === "admin") {
+                setValues(prev => ({ ...prev, redirect: true }))
             } else {
                 // signout user
                 signout(() => console.log('User is deleted'))

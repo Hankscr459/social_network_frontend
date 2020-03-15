@@ -112,7 +112,7 @@ const Profile = ({match}) => {
                                 <div className='d-inline-block'>
                                     <Link
                                         className='btn btn-raised btn-info mr-5'
-                                        to={`/posts/create`}
+                                        to={`/post/create`}
                                     >
                                         Create Post
                                     </Link>
@@ -129,7 +129,29 @@ const Profile = ({match}) => {
                                     following={following} 
                                     onButtonClick={clickFollowButton}
                                 />
-                            )}
+                        )}
+                        <div>
+                            {isAuthenticated().user &&
+                                isAuthenticated().user.role === "admin" && (
+                                    <div class="card mt-5">
+                                        <div className="card-body">
+                                            <h5 className="card-title">
+                                                Admin
+                                            </h5>
+                                            <p className="mb-2 text-danger">
+                                                Edit/Delete as an Admin
+                                            </p>
+                                            <Link
+                                                className="btn btn-raised btn-success mr-5"
+                                                to={`/user/edit/${user._id}`}
+                                            >
+                                                Edit Profile
+                                            </Link>
+                                            <DeleteUser userId={user._id} />
+                                        </div>
+                                    </div>
+                                )}
+                        </div>
                     </div>
                 </div>
             </div>

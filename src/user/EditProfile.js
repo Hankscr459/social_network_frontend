@@ -118,7 +118,10 @@ const EditProfile = ({match}) => {
             .then(data => {
                 if(data.error) {
                     setValues({ ...values, error: data.error })
-                } else {
+                } else if(isAuthenticated().user.role === "admin"){
+                    setValues({ ...values, redirectToSignup: true })
+                }
+                else {
                     updateUser(data, () => {
                         setValues({
                             ...values,
